@@ -22,7 +22,7 @@ A DMARC TXT record is a DNS record, which can be used to validate the origin of 
 
 ## Bypassing the countermeasures
 
-Many services send email to their customers using third-party solutions such as Mailgun and SendGrid, which handle SPF, DKIM and DMARC for the services. This means that the services must have allowed their email to go through these third-parties, which means that if a spear phishing email spoofing a service domain is sent through the correct third-party (e.g. SendGrid), the phishing email has a higher probability of bypassing the checks.
+Many services send email to their customers using third-party solutions such as Mailgun, SendGrid, Mailtrap, etc. which handle SPF, DKIM and DMARC for the services. This means that the services must have allowed their email to go through these third-parties, which means that if a spear phishing email spoofing a service domain is sent through the correct third-party (e.g. SendGrid), the phishing email has a higher probability of bypassing the checks.
 
 ## System goals
 
@@ -52,17 +52,21 @@ source: https://www.rfc-editor.org/rfc/rfc821
 
 The smtp server built-in Python can't be used as an actual smtp server, which would bypass any spoofing checks made by the receiver's email server. It could be configured to sign the email header fields with a key but this would not help much without the real keys of the spoofed domain.
 
-## Fallacies of the distributed system
-TBA
-
 ## Integration / extension by other systems
-TBA
+
+Gungnir could be easily extended or integrated by other systems as is, because the tool is essentially just a python script. It can run as a part of other systems with minimal or zero modification given that the external smtp servers are configured by the user.
 
 ## Evaluation of the project
-TBA
 
-## Future work
-TBA
+Although the configuration of external smtp servers (SaaS) are fairly uniform, the tool has not been actually tested with a multitude of external smtp servers. Servers typically use tokens or username/password combinations to authenticate senders and the code should be compatible with most servers, but this has not been thoroughly tested. The versatility of accepted payloads and field values can be tested fairly well with the built-in smtp debugging server. Most payloads are accepted (e.g. executable binary attachments).
+
+## Avenues for future work
+
+- Although Gungnir is a spear phishing tool, it could be easily extended to accommodate larger phishing campaigns with multiple receivers.
+
+- At the moment there is no way for the user to know if the external smtp server is reachable or not. For example the port could be wrong and the user wouldn't know.
+
+- The payloads could be renamed before sending. Now the user needs to rename the payload file before running Gungnir.
 
 # Configuration & usage
 
@@ -80,3 +84,11 @@ Run Gungnir:
 ```bash
 $ python3 gungnir.py
 ```
+
+An example run of the tool using the debugging server:
+
+![example-run](https://github.com/e2f5db0/gungnir/blob/main/img/example-run.png)
+
+Debugging server output:
+
+![debugging-server-output](https://github.com/e2f5db0/gungnir/blob/main/img/debugging-server.png)
