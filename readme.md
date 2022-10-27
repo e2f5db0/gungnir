@@ -34,15 +34,19 @@ Gungnir is a command line tool written in python. The system consists of the com
 
 ## Components / modules
 
-SMTP Debugging server: [Python SMTP Server](http://docs.python.org/library/smtpd.html)
-Can be used to view the raw contents of the spoofed emails.
+- SMTP Debugging server: [Python SMTP Server](http://docs.python.org/library/smtpd.html)
+    - Can be used to view the raw contents of the spoofed emails.
 
-The smtp library: [smtplib](https://docs.python.org/3/library/smtplib.html)
-Actually sends the spoofed emails with the parameters given by the user.
+- The smtp library: [smtplib](https://docs.python.org/3/library/smtplib.html)
+    - Actually sends the spoofed emails with the parameters given by the user.
 
 ## Communication channels (between the components)
 
 The smtplib module defines an SMTP client session object that can be used to send mail to any internet machine with an SMTP or ESMTP listener daemon.
+
+![smtp-protocol](https://github.com/e2f5db0/gungnir/blob/main/img/smtp-protocol.png)
+
+source: https://www.rfc-editor.org/rfc/rfc821 
 
 ## Pros & cons of the open-source components
 
@@ -62,17 +66,17 @@ TBA
 
 # Configuration & usage
 
-Clone the repository
+Clone the repository:
 ```bash
 git clone git@github.com:e2f5db0/gungnir.git
 ```
 
-Spin up the smtp debugging server
+Spin up the smtp debugging server (not needed if using an external smtp server):
 ```bash
 $ python3 -m smtpd -c DebuggingServer -n localhost:1025
 ```
 
-Run Gungnir
+Run Gungnir:
 ```bash
 $ python3 gungnir.py
 ```

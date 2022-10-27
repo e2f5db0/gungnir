@@ -1,22 +1,44 @@
 import re
 import smtplib
 import email.utils
+from os.path import basename
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
-# if no external smtp server is provided, a simple smtp server will be used
-def send_with_simple_server(sender, recipient, subject, body):
-    msg = MIMEText(body)
-    msg['To'] = email.utils.formataddr(('Recipient', recipient))
-    msg['From'] = email.utils.formataddr(('Author', sender))
-    msg['Subject'] = subject
-
-    client = smtplib.SMTP('127.0.0.1', 1025)
-    client.set_debuglevel(False) # show communication with the server
+def send_email(server_address, port, sender, recipient, subject, body, payload_path):
+    # include the payload as an attachment
+    if payload_path:
+        msg = MIMEMultipart()
+        with open(payload_path, 'rb') as f:
+            part = MIMEApplication(f.read(), Name=basename(payload_path))
+        part['Content-Disposition'] = 'attachment; filename="{}"'.format(basename(payload_path))
+        msg.attach(part)
+    # no attachment
+    else:
+        msg = MIMEText(body)
+        msg['To'] = email.utils.formataddr(('Recipient', recipient))
+        msg['From'] = email.utils.formataddr(('Author', sender))
+        msg['Subject'] = subject
+    # if no external smtp server is provided, smtp debugging server will be used
+    if server_address == '127.0.0.1' or server_address == 'localhost':
+        client = smtplib.SMTP('127.0.0.1', port)
+    # use external smtp server
+    else:
+        client.login(username, password)
+        client = smtplib.SMTP(server_address, port)
+    # Change to True to show communication with the server
+    client.set_debuglevel(False)
     try:
-      client.sendmail(sender, [recipient], msg.as_string())
+        client.sendmail(sender, [recipient], msg.as_string())
+        print('\nGungnir was sent flying.')
+        print('Where you recognize evil, speak out against it, and give no truces to your enemies.\n')
+    except Error as e:
+        print(f"An error occured: {e.msg}")
     finally:
       client.quit()
 
+# print the banner when the tool is run
 print("""
                                      __                
    ____  __ __  ____    ____   ____ |__|______ 
@@ -28,8 +50,29 @@ print("""
 – They are truly wise who's travelled far and knows the ways of the world.
 
 """)
+# check that server address is valid
+while True:
+    server_address = input('Enter smtp server address [addr:port] (optional):\n')
+    if not server_address:
+        server_address = '127.0.0.1'
+        port = 1025
+        break
+    if ':' in server_address and 'smtp.' in server_address:
+        try:
+            port = server_address.split(':')[1]
+            port = int(port)
+            server_address = server_address.split(':')[0]
+            break
+        except:
+            print('\nInvalid address. Try again.\n')
+    else:
+        print('\nInvalid address. Try again.\n')
 
-server_address = input('Enter smtp server address (optional):\n')
+if server_address != '127.0.0.1' and server_address != 'localhost':
+    username = input(f"\nEnter username (default: 'apikey'):\n")
+    if not username:
+        username = 'apikey'
+    password = input('\nEnter password or apikey:\n')
 
 while True:
     recipient = input(f"\nEnter the recipient's email address:\n")
@@ -51,24 +94,18 @@ subject = input('\nEnter the subject of the email:\n')
 
 message = input('\nEnter the message:\n')
 
-payload_path = input('\nEnter absolute path of a payload file (optional):\n')
+payload_path = input('\nEnter the absolute path of payload file (optional):\n')
 
 while True:
+    # ask for confirmation
     print('=====================================================================')
     print(f"You're about to send Gungnir flying with the following parameters:\n")
-    print(f"Sender: {spoofed_address}\nReceiver: {recipient}\nSubject: {subject}\nMessage body: {message}\nPayload: {payload_path}\n")
+    print(f"Server: {server_address}\nPort: {port}\nSender: {spoofed_address}\nReceiver: {recipient}\nSubject: {subject}\nMessage body: {message}\nPayload: {payload_path}\n")
     print('=====================================================================')
     confirmation = input('\nSend gungnir flying? [y/N]\n')
     if confirmation == 'y' or confirmation == 'Y':
-        # send the email
-        if not server_address or server_address == '127.0.0.1' or server_address == 'localhost':
-            send_with_simple_server(spoofed_address, recipient, subject, message)
-            print('\nGungnir was sent flying.')
-            print('Where you recognize evil, speak out against it, and give no truces to your enemies.\n')
-            break
-        else:
-            # send via external smtp server
-            print('TBA external server')
+        send_email(server_address, port, spoofed_address, recipient, subject, message, payload_path)
+        break
     elif confirmation == 'n' or confirmation == 'N' or not confirmation:
         print('\nAborted. Email not sent.')
         print(f"The foolish man thinks he will live forever if he keeps away from fighting; but old age won't grant him a truce, even if the spears do.\n")
