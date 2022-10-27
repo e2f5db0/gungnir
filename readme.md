@@ -1,5 +1,7 @@
 # Gungnir (spear phishing tool)
 
+![Gungnir](https://github.com/e2f5db0/gungnir/img/gungnir.png)
+
 ## How do phishing countermeasures work?
 
 Any legitimate email server performs some checks when receiving email. These checks will determine whether a phishing email will actually arrive to the receiver's inbox or end up in the spam folder.  
@@ -24,7 +26,7 @@ Many services send email to their customers using third-party solutions such as 
 
 ## System goals
 
-This tool can be used to send a targeted spear phishing email. If no external smtp server is set, a simple smtp server will be started. Emails sent through this server will probably not pass any of the checks used to counter phishing and spoofing.
+This tool can be used to send a targeted spear phishing email. If no external smtp server is set, a simple debugging server will be started. Emails sent through this server will not pass any of the checks used to counter phishing and spoofing.
 
 ## System architecture
 
@@ -32,16 +34,19 @@ Gungnir is a command line tool written in python. The system consists of the com
 
 ## Components / modules
 
-The smtp server: [Python SMTP Server](http://docs.python.org/library/smtpd.html)
+SMTP Debugging server: [Python SMTP Server](http://docs.python.org/library/smtpd.html)
+Can be used to view the raw contents of the spoofed emails.
 
 The smtp library: [smtplib](https://docs.python.org/3/library/smtplib.html)
+Actually sends the spoofed emails with the parameters given by the user.
 
 ## Communication channels (between the components)
 
 The smtplib module defines an SMTP client session object that can be used to send mail to any internet machine with an SMTP or ESMTP listener daemon.
 
 ## Pros & cons of the open-source components
-TBA
+
+The smtp server built-in Python can't be used as an actual smtp server, which would bypass any spoofing checks made by the receiver's email server. It could be configured to sign the email header fields with a key but this would not help much without the real keys of the spoofed domain.
 
 ## Fallacies of the distributed system
 TBA
@@ -56,4 +61,18 @@ TBA
 TBA
 
 # Configuration & usage
-TBA
+
+Clone the repository
+```bash
+git clone git@github.com:e2f5db0/gungnir.git
+```
+
+Spin up the smtp debugging server
+```bash
+$ python3 -m smtpd -c DebuggingServer -n localhost:1025
+```
+
+Run Gungnir
+```bash
+$ python3 gungnir.py
+```
