@@ -50,7 +50,7 @@ print("""
 – They are truly wise who's travelled far and knows the ways of the world.
 
 """)
-# check that server address is valid
+# check validity of smtp server address (improvement needed)
 while True:
     server_address = input('Enter smtp server address [addr:port] (optional):\n')
     if not server_address:
@@ -68,12 +68,14 @@ while True:
     else:
         print('\nInvalid address. Try again.\n')
 
+# credentials to external smtp server 
 if server_address != '127.0.0.1' and server_address != 'localhost':
     username = input(f"\nEnter username (default: 'apikey'):\n")
     if not username:
         username = 'apikey'
     password = input('\nEnter password or apikey:\n')
 
+# repeat until the input is a valid email address
 while True:
     recipient = input(f"\nEnter the recipient's email address:\n")
     match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', recipient)
@@ -82,6 +84,7 @@ while True:
     else:
         print('\nNot a valid email address. Try again.')
 
+# repeat until the input is a valid email address
 while True:
     spoofed_address = input(f"\nEnter the sender's spoofed email address:\n")
     match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', spoofed_address)
@@ -96,6 +99,7 @@ message = input('\nEnter the message:\n')
 
 payload_path = input('\nEnter the absolute path of payload file (optional):\n')
 
+# repeat the confirmation dialog until the input is either y or n. 
 while True:
     # ask for confirmation
     print('=====================================================================')
