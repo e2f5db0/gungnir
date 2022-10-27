@@ -1,6 +1,6 @@
 # Gungnir (spear phishing tool)
 
-![Gungnir](https://github.com/e2f5db0/gungnir/img/gungnir.png)
+![Gungnir](https://github.com/e2f5db0/gungnir/blob/main/img/gungnir.png)
 
 ## How do phishing countermeasures work?
 
